@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16.3-alpine3.20
+    restart: always
+    container_name: postgres
+    env_file:
+      - .env
+    volumes:
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    networks:
+      - work-network
+
+  workproject:
+    build:
+      context: ./workproject
+    volumes:
+      - ./workproject:/app
+      - static_volume:/app/static
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    networks:
+      - work-network
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/static
+    ports:
+      - "80:80"
+    depends_on:
+      - workproject
+    networks:
+      - work-network
+
+  tgapp:
+    build:
+      context: ./bot
+    volumes:
+      - ./bot:/bot
+    networks:
+      - work-network
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    restart: always
+
+volumes:
+  static_volume:
+  postgres_data:
+
+networks:
+  work-network:
+    driver: bridge
+    

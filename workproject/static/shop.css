@@ -1,0 +1,19 @@
+.field-category,
+.field-subcategory,
+.field-name {
+    width: calc(50% - 5px);
+    max-height: 2pc;
+    margin-bottom: 10px;
+}
+
+.field-description {
+    width: calc(50% - 5px);
+    margin-bottom: 10px;
+}
+
+#id_category,
+#id_subcategory,
+#id_name {
+    max-height: 20px;
+    min-height: 20px;
+}
